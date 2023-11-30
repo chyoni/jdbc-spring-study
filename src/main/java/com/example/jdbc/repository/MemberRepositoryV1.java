@@ -2,16 +2,25 @@ package com.example.jdbc.repository;
 
 import com.example.jdbc.connection.DBConnectionUtil;
 import com.example.jdbc.domain.Member;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.support.JdbcUtils;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.NoSuchElementException;
 
 /**
- * 순수 JDBC 사용
+ * JDBC - DataSource 사용, JdbcUtils 사용
  * */
 @Slf4j
-public class MemberRepositoryV0 {
+public class MemberRepositoryV1 {
+
+    private final DataSource dataSource;
+
+    public MemberRepositoryV1(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     public Member save(Member member) throws SQLException {
         String sql = "INSERT INTO member(member_id, money) VALUES (?, ?)";
@@ -20,7 +29,7 @@ public class MemberRepositoryV0 {
         PreparedStatement pstmt = null;
 
         try {
-            conn = DBConnectionUtil.getConnection();
+            conn = getConnection();
             pstmt = conn.prepareStatement(sql);
 
             pstmt.setString(1, member.getMemberId());
@@ -45,7 +54,7 @@ public class MemberRepositoryV0 {
         ResultSet rs = null;
 
         try {
-            connection = DBConnectionUtil.getConnection();
+            connection = getConnection();
             pstmt = connection.prepareStatement(sql);
 
             pstmt.setString(1, memberId);
@@ -74,7 +83,7 @@ public class MemberRepositoryV0 {
         PreparedStatement pstmt = null;
 
         try {
-            connection = DBConnectionUtil.getConnection();
+            connection = getConnection();
             pstmt = connection.prepareStatement(sql);
             pstmt.setInt(1, money);
             pstmt.setString(2, memberId);
@@ -96,7 +105,7 @@ public class MemberRepositoryV0 {
         PreparedStatement pstmt = null;
 
         try {
-            connection = DBConnectionUtil.getConnection();
+            connection = getConnection();
             pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, memberId);
 
@@ -109,30 +118,18 @@ public class MemberRepositoryV0 {
         }
     }
 
+    private Connection getConnection() throws SQLException {
+        Connection connection = dataSource.getConnection();
+        log.info("get connection = {} | class = {}", connection, connection.getClass());
+
+        return connection;
+    }
+
     private void close(Connection conn, Statement stmt, ResultSet rs) {
 
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException e) {
-                log.error("error: ", e);
-            }
-        }
+        JdbcUtils.closeResultSet(rs);
+        JdbcUtils.closeStatement(stmt);
+        JdbcUtils.closeConnection(conn);
 
-        if (stmt != null) {
-            try {
-                stmt.close();
-            } catch (SQLException e) {
-                log.error("error: ", e);
-            }
-        }
-
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                log.error("error: ", e);
-            }
-        }
     }
 }
