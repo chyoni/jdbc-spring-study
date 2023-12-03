@@ -1,30 +1,34 @@
 package com.example.jdbc.repository;
 
 import com.example.jdbc.domain.Member;
+import com.example.jdbc.exception.MyDbException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.NoSuchElementException;
 
 /**
- * JDBC - Transaction Manager
- *
- * DataSourceUtils.getConnection()
- * DataSourceUtils.releaseConnection()
+ * 예외 누수 문제 해결
+ * 체크 예외를 런타임 예외로 변경
+ * MemberRepository를 사용
+ * throws SQLException 제거
  * */
 @Slf4j
-public class MemberRepositoryV3 {
+@Repository
+public class MemberRepositoryV4_1 implements MemberRepository {
 
     private final DataSource dataSource;
 
-    public MemberRepositoryV3(DataSource dataSource) {
+    public MemberRepositoryV4_1(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public Member save(Member member) throws SQLException {
+    @Override
+    public Member save(Member member) {
         String sql = "INSERT INTO member(member_id, money) VALUES (?, ?)";
 
         Connection conn = null;
@@ -42,13 +46,14 @@ public class MemberRepositoryV3 {
             return member;
         } catch (SQLException e) {
             log.error("db error: ", e);
-            throw new SQLException(e);
+            throw new MyDbException(e);
         } finally {
             close(conn, pstmt, null);
         }
     }
 
-    public Member findById(String memberId) throws SQLException {
+    @Override
+    public Member findById(String memberId) {
         String sql = "SELECT * FROM member WHERE member_id = ?";
 
         Connection connection = null;
@@ -72,13 +77,14 @@ public class MemberRepositoryV3 {
             }
         } catch (SQLException e) {
             log.error("error: ", e);
-            throw new SQLException(e);
+            throw new MyDbException(e);
         } finally {
             close(connection, pstmt, rs);
         }
     }
 
-    public void update(String memberId, int money) throws SQLException {
+    @Override
+    public void update(String memberId, int money) {
         String sql = "UPDATE member SET money = ? WHERE member_id = ?";
 
         Connection connection = null;
@@ -94,13 +100,14 @@ public class MemberRepositoryV3 {
             log.info("result size: {}", resultSize);
         } catch (SQLException e) {
             log.error("error: ", e);
-            throw new SQLException(e);
+            throw new MyDbException(e);
         } finally {
             close(connection, pstmt, null);
         }
     }
 
-    public void delete(String memberId) throws SQLException {
+    @Override
+    public void delete(String memberId) {
         String sql = "DELETE FROM member WHERE member_id = ?";
 
         Connection connection = null;
@@ -114,7 +121,7 @@ public class MemberRepositoryV3 {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             log.error("error: ", e);
-            throw new SQLException(e);
+            throw new MyDbException(e);
         } finally {
             close(connection, pstmt, null);
         }

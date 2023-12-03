@@ -1,38 +1,37 @@
 package com.example.jdbc.service;
 
 import com.example.jdbc.domain.Member;
+import com.example.jdbc.repository.MemberRepository;
 import com.example.jdbc.repository.MemberRepositoryV3;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.sql.SQLException;
 
 /**
- * 트랜잭션 - 트랜잭션 매니저
+ * 예외 누수 문제 해결
+ * SQLException 제거
+ *
+ * MemberRepository 의존
  * */
 @Slf4j
 @RequiredArgsConstructor
-public class MemberServiceV3_1 {
+@Service
+public class MemberServiceV4 {
 
-    private final PlatformTransactionManager transactionManager;
-    private final MemberRepositoryV3 memberRepository;
+    private final MemberRepository memberRepository;
 
+    @Transactional
     public void accountTransfer(String fromId, String toId, int money) {
-        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-
-        try {
-            doTransfer(fromId, toId, money);
-            transactionManager.commit(status); // 성공시 커밋
-        } catch (Exception e) {
-            transactionManager.rollback(status); // 실패시 롤백
-            throw new IllegalStateException(e);
-        }
+        doTransfer(fromId, toId, money);
     }
 
-    private void doTransfer(String fromId, String toId, int money) throws SQLException {
+    private void doTransfer(String fromId, String toId, int money) {
         Member fromMember = memberRepository.findById(fromId);
         Member toMember = memberRepository.findById(toId);
 
