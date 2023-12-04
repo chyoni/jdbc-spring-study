@@ -1,3 +1,4 @@
+/*
 package com.example.jdbc.repository;
 
 import com.example.jdbc.domain.Member;
@@ -14,9 +15,11 @@ import java.sql.*;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+*/
 /**
  * SQLExceptionTranslator 추가
- * */
+ * *//*
+
 @Slf4j
 @Repository
 public class MemberRepositoryV4_2 implements MemberRepository {
@@ -142,3 +145,4 @@ public class MemberRepositoryV4_2 implements MemberRepository {
         DataSourceUtils.releaseConnection(conn, dataSource);
     }
 }
+*/
