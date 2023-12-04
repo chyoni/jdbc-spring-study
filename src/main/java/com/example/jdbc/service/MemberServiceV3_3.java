@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
+
 /**
  * 트랜잭션 - @Transactional AOP
  * */
@@ -21,11 +23,11 @@ public class MemberServiceV3_3 {
     }
 
     @Transactional
-    public void accountTransfer(String fromId, String toId, int money) {
+    public void accountTransfer(String fromId, String toId, int money) throws SQLException {
             doTransfer(fromId, toId, money);
     }
 
-    private void doTransfer(String fromId, String toId, int money) {
+    private void doTransfer(String fromId, String toId, int money) throws SQLException {
         Member fromMember = memberRepository.findById(fromId);
         Member toMember = memberRepository.findById(toId);
 

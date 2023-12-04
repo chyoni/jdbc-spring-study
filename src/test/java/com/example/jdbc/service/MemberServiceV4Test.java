@@ -1,17 +1,23 @@
 package com.example.jdbc.service;
 
+import com.example.jdbc.connection.ConnectionConst;
 import com.example.jdbc.domain.Member;
 import com.example.jdbc.repository.MemberRepository;
+import com.example.jdbc.repository.MemberRepositoryV4_2;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import javax.sql.DataSource;
 import java.sql.SQLException;
 
+import static com.example.jdbc.connection.ConnectionConst.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -26,7 +32,6 @@ class MemberServiceV4Test {
 
     @Autowired private MemberRepository memberRepository;
     @Autowired private MemberServiceV4 memberService;
-
 
     @AfterEach
     void afterEach() {

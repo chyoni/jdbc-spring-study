@@ -53,7 +53,7 @@ class MemberServiceV3_3Test {
     }
 
     @AfterEach
-    void afterEach() {
+    void afterEach() throws SQLException {
         memberRepository.delete(MEMBER_A);
         memberRepository.delete(MEMBER_B);
         memberRepository.delete(MEMBER_EX);

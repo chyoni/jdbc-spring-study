@@ -60,7 +60,7 @@ public class ExTranslatorV1Test {
             }
         }
 
-        public String generateNewId(String memberId) {
+        private String generateNewId(String memberId) {
             return memberId + new Random().nextInt(10000);
         }
     }

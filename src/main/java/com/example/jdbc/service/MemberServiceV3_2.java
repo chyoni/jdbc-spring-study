@@ -28,11 +28,15 @@ public class MemberServiceV3_2 {
     public void accountTransfer(String fromId, String toId, int money) {
 
         transactionTemplate.executeWithoutResult(transactionStatus -> {
-            doTransfer(fromId, toId, money);
+            try {
+                doTransfer(fromId, toId, money);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
-    private void doTransfer(String fromId, String toId, int money) {
+    private void doTransfer(String fromId, String toId, int money) throws SQLException {
         Member fromMember = memberRepository.findById(fromId);
         Member toMember = memberRepository.findById(toId);
 
